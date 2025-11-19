@@ -1,26 +1,26 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.io.wavfile as wav
 import noisereduce as nr
 
 # ---------------------------------------------------------
-# 1. Load the two speech samples
+# Load speech samples
 # ---------------------------------------------------------
 Fs1, data1 = wav.read('AirportAnnouncements_10.wav')
 Fs2, data2 = wav.read('CafeTeria_1.wav')
 
-# Convert to float
-data1 = data1.astype(float)
-data2 = data2.astype(float)
+# Normalize to -1…1 range
+data1 = data1 / 32767.0
+data2 = data2 / 32767.0
 
 # ---------------------------------------------------------
-# 2. Apply noise reduction using noisereduce
+# Noise reduction using noisereduce
 # ---------------------------------------------------------
 data1_nr = nr.reduce_noise(y=data1, sr=Fs1)
 data2_nr = nr.reduce_noise(y=data2, sr=Fs2)
 
 # ---------------------------------------------------------
-# 3. Extract sample window 300–500
+# Extract 300–500 sample clips
 # ---------------------------------------------------------
 clip1 = data1[300:500]
 clip1_nr = data1_nr[300:500]
@@ -29,20 +29,38 @@ clip2 = data2[300:500]
 clip2_nr = data2_nr[300:500]
 
 # ---------------------------------------------------------
-# 4. Plot spectrograms
+# Spectrogram settings (MATCHING YOUR REFERENCE)
 # ---------------------------------------------------------
-fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+NFFT = 1024
+noverlap = 128
+mode = 'psd'
+scale = 'dB'
 
-def plot_spec(ax, data, fs, title):
-    ax.specgram(data, NFFT=64, Fs=fs, noverlap=32, cmap="inferno")
+# ---------------------------------------------------------
+# Plot 4 aligned spectrograms: original + noise-reduced
+# ---------------------------------------------------------
+fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 8))
+
+def plot_spec(ax, data, Fs, title):
+    # same call style as your example
+    Pxx, freqs, bins, im = ax.specgram(
+        data, NFFT=NFFT, Fs=Fs, noverlap=noverlap,
+        mode=mode, scale=scale
+    )
     ax.set_title(title)
-    ax.set_ylabel("Frequency (Hz)")
+    ax.set_ylabel('Frequency (Hz)')
+    return Pxx, freqs, bins, im
 
-plot_spec(axes[0, 0], clip1, Fs1, "Original Airport (300–500)")
-plot_spec(axes[0, 1], clip1_nr, Fs1, "Noise-Reduced Airport (300–500)")
+# Airport sample
+plot_spec(axes[0,0], clip1,    Fs1, "Airport (Original) 300–500")
+plot_spec(axes[0,1], clip1_nr, Fs1, "Airport (Noise Reduced) 300–500")
 
-plot_spec(axes[1, 0], clip2, Fs2, "Original Cafeteria (300–500)")
-plot_spec(axes[1, 1], clip2_nr, Fs2, "Noise-Reduced Cafeteria (300–500)")
+# Cafeteria sample
+plot_spec(axes[1,0], clip2,    Fs2, "Cafeteria (Original) 300–500")
+plot_spec(axes[1,1], clip2_nr, Fs2, "Cafeteria (Noise Reduced) 300–500")
+
+axes[1][0].set_xlabel('Time (s)')
+axes[1][1].set_xlabel('Time (s)')
 
 plt.tight_layout()
 plt.show()
