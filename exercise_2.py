@@ -3,9 +3,7 @@ import numpy as np
 import scipy.io.wavfile as wav
 import noisereduce as nr
 
-# ---------------------------------------------------------
-# Load speech samples
-# ---------------------------------------------------------
+
 Fs1, data1 = wav.read('AirportAnnouncements_10.wav')
 Fs2, data2 = wav.read('CafeTeria_1.wav')
 
@@ -13,32 +11,21 @@ Fs2, data2 = wav.read('CafeTeria_1.wav')
 data1 = data1 / 32767.0
 data2 = data2 / 32767.0
 
-# ---------------------------------------------------------
-# Noise reduction using noisereduce
-# ---------------------------------------------------------
+
 data1_nr = nr.reduce_noise(y=data1, sr=Fs1)
 data2_nr = nr.reduce_noise(y=data2, sr=Fs2)
 
-# ---------------------------------------------------------
-# Extract 300–500 sample clips
-# ---------------------------------------------------------
-clip1 = data1[300:500]
+
 clip1_nr = data1_nr[300:500]
 
 clip2 = data2[300:500]
 clip2_nr = data2_nr[300:500]
 
-# ---------------------------------------------------------
-# Spectrogram settings (MATCHING YOUR REFERENCE)
-# ---------------------------------------------------------
 NFFT = 1024
 noverlap = 128
 mode = 'psd'
 scale = 'dB'
 
-# ---------------------------------------------------------
-# Plot 4 aligned spectrograms: original + noise-reduced
-# ---------------------------------------------------------
 fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12, 8))
 
 def plot_spec(ax, data, Fs, title):
