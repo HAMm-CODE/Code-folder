@@ -233,17 +233,5 @@ axes[1, 0].set_title('Training Loss Comparison', fontsize=12, fontweight='bold')
 axes[1, 0].legend()
 axes[1, 0].grid(True, alpha=0.3)
 
-# Accuracy Comparison
-methods = ['No Normalization', 'With Normalization']
-accuracies = [accuracy_no_norm*100, accuracy_norm*100]
-colors = ['#FF6B6B', '#51CF66']
-bars = axes[1, 1].bar(methods, accuracies, color=colors, edgecolor='black', linewidth=2)
-axes[1, 1].set_ylabel('Accuracy (%)', fontsize=11)
-axes[1, 1].set_title('Accuracy Comparison', fontsize=12, fontweight='bold')
-axes[1, 1].set_ylim([0, 100])
-for i, (bar, acc) in enumerate(zip(bars, accuracies)):
-    axes[1, 1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
-                    f'{acc:.2f}%', ha='center', va='bottom', fontweight='bold')
-
 plt.tight_layout()
 plt.show()
